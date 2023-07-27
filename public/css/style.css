@@ -1,0 +1,84 @@
+body{
+    font-family: sans-serif;
+    background-color: rgb(233, 226, 125);
+    margin: 30px 400px 500px 400px;
+    font-size: 14px;
+    max-width: 1400px;
+    background-color: rgb(250, 255, 197);
+}
+
+h1{
+    text-align: center;
+    font-size:50px;
+    margin-right: 400px;
+}
+h2{
+    text-align: center;
+    font-size: xx-large;
+    margin-bottom: 50px;
+    margin-right: 400px;
+}
+table{
+    font-size: 25px;
+    margin: 20px 200px 20px 200px;
+}
+.lang{
+    height: 100px;
+    width: 140px;
+    font-size: 30px;
+    color: black;
+    background-color: rgb(233, 226, 125);
+    margin: 5px 0 5px 15px;
+    float: right;
+    text-align: center  ;
+    text-decoration: none;
+}
+.form{
+    height: 50px;
+    width: 100px;
+    background-color: rgb(233, 226, 125);
+    margin: 5px 0 5px 15px
+}
+.form2{
+    height: 40px;
+    width:70px;
+    background-color: rgb(233, 226, 125);
+    margin: 5px 0 5px 15px;
+    
+}
+#login{
+  float:right;
+  
+}
+#buy{
+    float: right;
+    height: 70px;
+    width: 140px;
+    background-color: rgb(32, 214, 47);
+    border-radius:50%;
+}
+td{
+    text-align: center;
+}
+#home{
+    color: black;
+    font-size: 25px;
+    background-color: rgb(233, 226, 125);
+}
+
+footer{
+    text-align: right;
+    display: block;
+    font-size: 25px;
+    position: relative;
+    height: 100%;
+    min-height: 100vh;
+}
+#name{
+    font-size: 25px;
+    font-style: italic;
+}
+#img{
+    float: left;
+    margin-left: 200px;
+}
