@@ -3,7 +3,7 @@
 phases:
   install:
     runtime-versions:
-      php: 8.0
+      php: 8.1
   pre_build: # commands to be run before build
     commands:
     - echo Logging in to Amazon ECR....
