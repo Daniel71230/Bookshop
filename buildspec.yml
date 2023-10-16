@@ -22,7 +22,9 @@ phases:
     - echo generating app key
     - php artisan key:generate
     - echo Building the Docker image...
-    - sudo dockerd
+    - sudo systemctl status docker
+    - sudo systemctl start docker
+    - sudo systemctl enable docker
     - sudo docker build -t $REPOSITORY_URI:latest .
     - sudo docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
   post_build:
