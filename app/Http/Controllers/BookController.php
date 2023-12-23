@@ -5,13 +5,14 @@ use Illuminate\Http\Request;
 use App\Models\Book;
 use App\Models\Genre;
 use App\Models\Userbooks;
+use App\Models\Cart;
+use App\Models\Order;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 
 use Session;
 use Stripe;
-require_once 'C:\wamp64\www\vendor\stripe\stripe-php\init.php';
 
 class BookController extends Controller
 {
@@ -122,32 +123,78 @@ class BookController extends Controller
         return redirect('book/genre/' . $genre_id);}
         return redirect('book/genre/' . $genre_id)->withErrors(['msg' => 'This option is for admins only!']);
     }
-    public function buy($id)
+    public function add_cart($id)
     {
         $book=Book::findOrFail($id);
         $genre_id = Book::findOrFail($id)->genre_id;
         if(Auth::check()){
 
-            $user_id=auth()->user()->id;
-            $username=auth()->user()->name;
-            if(Userbooks::where('book_id', '=', $book->id)->where( 'user_id', '=', $user_id)->exists()){
-                return redirect('book/genre/' . $genre_id)->withErrors(['msg' => 'You already have this book!']);
-            }
-            DB::table('userbooks')->insert(
-                array(  'book_id' =>$book->id,
-                       'user_id'   => $user_id,
-                       'username'   =>   $username,
-                       'bookname'   =>   $book->name,
-                )
-            );
+            $user = Auth::user();
 
+            $cart = new cart;
 
-            return redirect('book/genre/' . $genre_id);
+            $cart->name = $user->name;
 
+            $cart->email = $user->email;
 
+            $cart->book_title = $book->name;
+
+            $cart->price = $book->price;
+
+            $cart->user_id = Auth::user()->id;
+
+            $cart->book_id = $book->id;
+
+            $cart->save();
+            return redirect()->back();
         }
-        return redirect('book/genre/' . $genre_id)->withErrors(['msg' => 'This option is for authentificated users only!']);
+        return redirect('/login');
     }
+    public function show_cart(){
+
+        if(Auth::check()){
+            $id=Auth::user()->id;
+
+            $cart = cart::where('user_id','=',$id)->get();
+
+            return view('showcart', compact('cart'));
+        }
+        return redirect('login');
+    }
+    public function remove_cart($id){
+        $cart=cart::find($id);
+
+        $cart->delete();
+
+        return redirect()->back();
+    }
+
+    public function cash_order(){
+        $user = Auth::user();
+
+        $userid=$user->id;
+
+        $data = cart::where('user_id','=',$userid)->get();
+
+        foreach($data as $d){
+            $order = new order;
+            $order->name=$d->name;
+            $order->email=$d->email;
+            $order->book_title=$d->book_title;
+            $order->price=$d->price;
+            $order->book_id=$d->book_id;
+            $order->user_id=$d->user_id;
+            $order->payment_status="cash on delivery";
+            $order->delivery_status="processing";
+            $order->save();
+
+            $cart_id=$d->id;
+            $cart=cart::find($cart_id);
+            $cart->delete();
+        }
+        return redirect()->back()->with('message', 'Order sent!');
+    }
+
     public function stripe($price)
     {
         if(Auth::check()){
@@ -155,13 +202,13 @@ class BookController extends Controller
         }
         return back()->withErrors(['msg' => 'This option is for authentificated users only!']);
     }
-    public function stripePost(Request $request, $price)
+    public function stripePost(Request $request, $price, $id)
     {
-        //dd($price);
+        dd($price);
         Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
         Stripe\Charge::create ([
 
-                "amount" => $price * 100,
+                "amount" => (int)$price * 100 ,
 
                 "currency" => "eur",
 
@@ -171,10 +218,22 @@ class BookController extends Controller
 
         ]);
         $user = Auth::user();
-        $userid = $user->id;
+        $user_id = $user->id;
+        $username=$user->name;
 
-        $books = Userbooks::where;
+        $book=Book::findOrFail($id);
+        $genre_id = Book::findOrFail($id)->genre_id;
+        if(Userbooks::where('book_id', '=', $book->id)->where( 'user_id', '=', $user_id)->exists()){
+            return redirect('book/genre/' . $genre_id)->withErrors(['msg' => 'You already have this book!']);
+        }
         Session::flash('success', 'Payment successful!');
+        DB::table('userbooks')->insert(
+            array(  'book_id' =>$book->id,
+                   'user_id'   => $user_id,
+                   'username'   =>   $username,
+                   'bookname'   =>   $book->name,
+            )
+        );
         return back();
     }
 }

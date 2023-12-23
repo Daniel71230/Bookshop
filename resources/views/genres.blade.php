@@ -12,6 +12,7 @@
 <h1>@lang('messages.bookshop')</h1>
 <h2>@lang('messages.genres'):</h2>
 <p> <a  class="lang" href="{{route('locale',__('messages.set_lang'))}}">@lang('messages.language'): <u>@lang('messages.set_lang')</u></a></p>
+<p> <a id="cart" type="button" class="form" href="{{url('show_cart')}}"> Cart</a> </p>
 @if($errors->any())
 <h4 style="color: red; text-align:center; font-size: 20px;">Error: {{$errors->first()}}</h4>
 @endif

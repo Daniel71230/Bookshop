@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
 <link href="{{ asset('/css/style.css?v=').time() }}" rel="stylesheet" type="text/css" >
 <title>@lang('messages.books')</title>
 </head>
@@ -8,7 +9,8 @@
 
 <main>
 <p> <input id="login" type="button" class="form" value="@lang('messages.login')" onclick="Login()"> </p>
-<p> <input id="login" type="button" class="form" value="@lang('messages.logout')" onclick="Logout()"> </p>
+<p> <input id="logout" type="button" class="form" value="@lang('messages.logout')" onclick="Logout()"> </p>
+<p> <a id="cart" type="button" class="form" href="{{url('show_cart')}}"> Cart</a> </p>
 <p> <a  style="float: left;" class="lang" href="{{route('locale',__('messages.set_lang'))}}">@lang('messages.language'): <u>@lang('messages.set_lang')</u></a></p>
 
 <h1 style="margin-right: 200px;"><b>{{ $genre->name }} </b></h1>
@@ -31,7 +33,8 @@
 
 <!--<form  class='input' method="get" action="{{action([App\Http\Controllers\BookController::class, 'buy' ], $b->id) }}"
 >-->
-<form  class='input' method="get" action="{{url('stripe', $b->price) }}">
+<form  class='input' method="post" action="{{url('add_cart', $b->id) }}">
+@csrf
 
 <input type="submit" class="form" id='buy'
 value="@lang('messages.buy')"></form>

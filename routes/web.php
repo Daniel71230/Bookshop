@@ -34,17 +34,21 @@ Route::get('book/genre/{id}/create', [BookController::class, 'create']);
 Route::get('book/genre/{id}/update', [BookController::class, 'update']);
 Route::get('book/genre/{id}/edit', [BookController::class, 'edit']);
 Route::get('userbooks/{id}', [BookController::class, 'buy']);
-Route::get('stripe/{price}', [BookController::class, 'stripe']);
-Route::post('stripe/{price}', [BookController::class, 'stripePost'])->name('stripe.post');
+Route::get('stripe/{price}/{id}', [BookController::class, 'stripe'])->name('stripe');
+Route::post('stripe/{price}/{id}', [BookController::class, 'stripePost'])->name('stripe.post');
 Route::get('review/book/{id}', [ReviewController::class, 'index']);
 Route::get('review/book/{id}/create', [ReviewController::class, 'create']);
 Route::get('userbooks', [AdminController::class, 'viewBooks']);
+Route::post('/add_cart/{id}', [BookController::class, 'add_cart']);
 });
+Route::get('/show_cart', [BookController::class, 'show_cart']);
+Route::get('/remove_cart/{id}', [BookController::class, 'remove_cart']);
+Route::get('/cash_order', [BookController::class, 'cash_order']);
 
 
 Route::get('/login', function(){
     if(Auth::check()){
-        return redirect(route('main'));
+        return redirect('/');
     }
     return view('login');
 })->name('login');

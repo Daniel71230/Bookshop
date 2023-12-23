@@ -13,11 +13,11 @@ class LoginController extends Controller
         }
         $formfields=$request->only(['name','password']);
         if(Auth::attempt($formfields)){
-            return redirect()->intended('/');
+            return redirect()->back();
         }
-    
+
     return redirect(route('login'))->withErrors([
         'name' =>  'Invalid login!'
     ]);
-    }   
+    }
 }

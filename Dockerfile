@@ -1,11 +1,41 @@
-FROM php:8.1.2-apache-stretch
+# Used for prod build.
+FROM php:8.1-fpm as php
 
-LABEL maintainer="Daniels Janovskis <danielsjanovskis@gmail.com>" version="1.0"
+# Set environment variables
+ENV PHP_OPCACHE_ENABLE=1
+ENV PHP_OPCACHE_ENABLE_CLI=0
+ENV PHP_OPCACHE_VALIDATE_TIMESTAMPS=0
+ENV PHP_OPCACHE_REVALIDATE_FREQ=0
 
-COPY --chown=www-data:www-data . /srv/app
+# Install dependencies.
+RUN apt-get update && apt-get install -y unzip libpq-dev libcurl4-gnutls-dev nginx libonig-dev
 
-COPY .docker/vhost.conf /etc/apache2/sites-available/000-default.conf
+# Install PHP extensions.
+RUN docker-php-ext-install mysqli pdo pdo_mysql bcmath curl opcache mbstring
 
-WORKDIR /srv/app
+# Copy composer executable.
+COPY --from=composer:2.3.5 /usr/bin/composer /usr/bin/composer
 
-RUN docker-php-ext-install mbstring pdo pdo_mysql && a2enmod rewrite negotiation && docker-php-ext-install opcache
+# Copy configuration files.
+COPY ./docker/php/php.ini /usr/local/etc/php/php.ini
+COPY ./docker/php/php-fpm.conf /usr/local/etc/php-fpm.d/www.conf
+COPY ./docker/nginx/nginx.conf /etc/nginx/nginx.conf
+
+# Set working directory to ...
+WORKDIR /app
+
+# Copy files from current folder to container current folder (set in workdir).
+COPY --chown=www-data:www-data . .
+
+# Create laravel caching folders.
+RUN mkdir -p ./storage/framework
+RUN mkdir -p ./storage/framework/{cache, testing, sessions, views}
+RUN mkdir -p ./storage/framework/bootstrap
+RUN mkdir -p ./storage/framework/bootstrap/cache
+
+# Adjust user permission & group.
+RUN usermod --uid 1000 www-data
+RUN groupmod --gid 1000  www-data
+
+# Run the entrypoint file.
+ENTRYPOINT [ "docker/entrypoint.sh" ]
